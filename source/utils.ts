@@ -13,13 +13,12 @@ export function getCSVFilesInFolder(folderPath: string): CSVFile[] {
   const folderContents = fs.readdirSync(folderPath);
 
   for (const item of folderContents) {
-    const itemPath = path.join(item);
+    const itemPath = path.join(folderPath + "/" + item);
     const stats = fs.statSync(itemPath);
     if (stats.isFile()) {
       if (path.extname(itemPath) === ".csv") {
-        const match = itemPath.match(REGEX_PATTERN);
-        const destinationFilePath = `${PUBLIC_FOLDER_NAME}/${itemPath}`;
-        console.log(destinationFilePath);
+        const match = item.match(REGEX_PATTERN);
+        const destinationFilePath = `${PUBLIC_FOLDER_NAME}/${item}`;
 
         if (match) {
           const a = match;
@@ -30,18 +29,18 @@ export function getCSVFilesInFolder(folderPath: string): CSVFile[] {
           ) {
             throw new Error("ERROR: Not valid initials in csv file");
           }
-          const obj = new CSVFile(itemPath, uniInitials, stats, dateTime);
+          const obj = new CSVFile(item, uniInitials, stats, dateTime);
 
           if (fs.existsSync(destinationFilePath)) {
-            console.log(
-              `File ${itemPath} already exists in the destination folder.`
-            );
+            //console.log(
+            //  `File ${itemPath} already exists in the destination folder.`
+            //);
           } else {
             fs.copyFile(itemPath, destinationFilePath, (err) => {
               if (err) {
                 console.error(`Error copying file ${itemPath}:`, err);
               } else {
-                console.log(`File ${itemPath} copied successfully.`);
+                //console.log(`File ${itemPath} copied successfully.`);
               }
             });
           }

@@ -17,7 +17,7 @@ if (FOLDER_PATH === undefined) {
 export let csv_files: CSVFile[] = [];
 setInterval(() => {
   csv_files = getCSVFilesInFolder(FOLDER_PATH);
-}, 6000);
+}, 60000);
 
 const server = new APIServer();
 server.start();
