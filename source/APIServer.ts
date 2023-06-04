@@ -3,6 +3,7 @@ import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import { UniversityRoute } from "./routes/UniversityRoute";
+import { CourseRoute } from "./routes/CourseRoute";
 
 class APIServer {
   public app: express.Application;
@@ -14,6 +15,7 @@ class APIServer {
 
   public routes(): void {
     this.app.use("/api", new UniversityRoute().router);
+    this.app.use("/api", new CourseRoute().router);
   }
 
   public config(): void {
