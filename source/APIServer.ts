@@ -2,8 +2,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
-import { CSVRoute } from "./route";
-import path from "path";
+import { UniversityRoute } from "./routes/UniversityRoute";
 
 class APIServer {
   public app: express.Application;
@@ -14,11 +13,12 @@ class APIServer {
   }
 
   public routes(): void {
-    this.app.use("/", new CSVRoute().router);
+    this.app.use("/api", new UniversityRoute().router);
   }
 
   public config(): void {
     this.app.use(express.json());
+    this.app.use(morgan("dev"));
 
     this.app.use(bodyParser.json({ limit: "10mb" }));
 
