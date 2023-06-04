@@ -5,7 +5,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   CreateDateColumn,
+  OneToMany,
 } from "typeorm";
+import { Course } from "./Course";
 
 @Entity("universities")
 export class University extends BaseEntity {
@@ -31,6 +33,11 @@ export class University extends BaseEntity {
     unique: true,
   })
   scholar!: string;
+
+  @OneToMany(() => Course, (course) => course.university, {
+    cascade: true,
+  })
+  courses!: Course[];
 
   @UpdateDateColumn()
   updated_at!: Date;

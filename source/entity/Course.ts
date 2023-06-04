@@ -5,7 +5,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   CreateDateColumn,
+  ManyToOne,
 } from "typeorm";
+import { University } from "./University";
 
 @Entity("courses")
 export class Course extends BaseEntity {
@@ -23,6 +25,9 @@ export class Course extends BaseEntity {
 
   @Column({})
   href!: string;
+
+  @ManyToOne(() => University, (university: University) => university.courses)
+  university!: University;
 
   @UpdateDateColumn()
   updated_at!: Date;

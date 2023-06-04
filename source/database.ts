@@ -2,6 +2,7 @@ import { DataSource, Unique } from "typeorm";
 import dotenv from "dotenv";
 import { University } from "./entity/University";
 import { Course } from "./entity/Course";
+import "reflect-metadata";
 dotenv.config();
 
 function buildDatabaseConfigFromSource(): {
