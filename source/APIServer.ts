@@ -4,6 +4,7 @@ import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import { UniversityRoute } from "./routes/UniversityRoute";
 import { CourseRoute } from "./routes/CourseRoute";
+import { InstructorRoute } from "./routes/InstructorRoute";
 
 class APIServer {
   public app: express.Application;
@@ -16,6 +17,7 @@ class APIServer {
   public routes(): void {
     this.app.use("/api", new UniversityRoute().router);
     this.app.use("/api", new CourseRoute().router);
+    this.app.use("/api", new InstructorRoute().router);
   }
 
   public config(): void {

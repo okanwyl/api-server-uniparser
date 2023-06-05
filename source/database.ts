@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { University } from "./entity/University";
 import { Course } from "./entity/Course";
 import "reflect-metadata";
+import { Instructor } from "./entity/Instructor";
 dotenv.config();
 
 function buildDatabaseConfigFromSource(): {
@@ -57,7 +58,7 @@ const databaseSource = new DataSource({
   logger: "simple-console",
   synchronize: true,
   cache: true,
-  entities: [University, Course],
+  entities: [University, Course, Instructor],
 });
 
 export default databaseSource;

@@ -36,4 +36,4 @@ export class Course extends BaseEntity {
   created_at!: Date;
 }
 
-// TODO: Instructor, organizaton
+// TODO: Instructor 

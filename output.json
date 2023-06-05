@@ -1,0 +1,23 @@
+{
+  "container_type": "Author",
+  "filled": ["publications", "indices", "basics"],
+  "source": "SEARCH_AUTHOR_SNIPPETS",
+  "scholar_id": "SwptW3oAAAAJ",
+  "url_picture": "https://scholar.google.com/citations?view_op=medium_photo&user=SwptW3oAAAAJ",
+  "name": "Birol Ciloglugil",
+  "affiliation": "Ege University, Dept. of Computer Engineering",
+  "email_domain": "@ege.edu.tr",
+  "interests": [
+    "Adaptive E-Learning",
+    "Personalization",
+    "User Modeling",
+    "Learning Analytics"
+  ],
+  "citedby": 200,
+  "citedby5y": 149,
+  "hindex": 8,
+  "hindex5y": 7,
+  "i10index": 6,
+  "i10index5y": 5,
+  "organization": 2132109780519676157
+}

@@ -5,7 +5,6 @@ import { Course } from "../entity/Course";
 const courseRepository = databaseSource.getRepository(Course);
 
 class CourseRepository {
-  private universityRepository = databaseSource.getRepository(Course);
   async createCourse(input: Partial<Course>): Promise<Course> {
     return await courseRepository.save(courseRepository.create(input));
   }
