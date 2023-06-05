@@ -7,3 +7,6 @@ package-lock.json
 mysql/
 notes
 output.json
+*.swp
+venv/
+__pycache__/
