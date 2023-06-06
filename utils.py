@@ -1,3 +1,4 @@
+import csv
 from typing import NamedTuple
 import mysql.connector
 from dotenv import load_dotenv
@@ -20,6 +21,21 @@ class DatabaseConfig(NamedTuple):
             f"username: {self.username}\n"
             f"password: {self.password}\n"
             f"database: {self.database}\n"
+        )
+
+
+class University(NamedTuple):
+    name: str
+    initials: str
+    href: str
+    scholar: str
+
+    def __str__(self) -> str:
+        return (
+            f"name: {self.name}\n"
+            f"initials: {self.initials}\n"
+            f"href: {self.href}\n"
+            f"scholar: {self.scholar}\n"
         )
 
 
@@ -60,3 +76,41 @@ def read_database_config() -> DatabaseConfig:
     )
 
     return db
+
+
+def extract_column(csv_file, column_index, use_unique=False):
+    column_data = []
+    with open(csv_file, "r") as file:
+        reader = csv.reader(file)
+        next(reader)
+        for row in reader:
+            if len(row) > column_index:
+                column_data.append(row[column_index])
+
+    if use_unique:
+        column_data = list(set(column_data))
+
+    return column_data
+
+
+def insert_university_data(university: University):
+    config = read_database_config()
+
+    cnx, cur = connect_to_database(config)
+
+    if not cnx or not cur:
+        raise Exception("cnx and cur not defined")
+
+    insert_query = """
+    INSERT INTO universities (name, initials, href, scholar)
+    VALUES (%s, %s, %s, %s)
+    """
+    cur.execute(
+        insert_query,
+        (university.name, university.initials, university.href, university.scholar),
+    )
+    cnx.commit()
+
+    close_connection(cnx, cur)
+
+    print("University data inserted successfully!")

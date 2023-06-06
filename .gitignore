@@ -1,7 +1,6 @@
 node_modules/
 .dist
 dist/
-*.csv
 package-lock.json
 .env
 mysql/
@@ -9,4 +8,5 @@ notes
 output.json
 *.swp
 venv/
+pg.py
 __pycache__/
