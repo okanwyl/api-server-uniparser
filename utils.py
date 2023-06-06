@@ -39,6 +39,86 @@ class University(NamedTuple):
         )
 
 
+class Course:
+    name: str
+    code: str
+    info: str
+    href: str
+    university_id: int
+
+    def __init__(self, name, code, info, href, university_id=None, instructor_id=None):
+        self.name = name
+        self.code = code
+        self.info = info
+        self.href = href
+        self.university_id = university_id
+
+    def __str__(self) -> str:
+        return (
+            f"name: {self.name}\n"
+            f"code: {self.code}\n"
+            f"info: {self.info}\n"
+            f"href: {self.href}\n"
+            f"university_id: {self.university_id}\n"
+        )
+
+
+class Instructor:
+    scholar_id: str
+    profile_picture: str
+    filtered_name: str
+    titled_name: str
+    interests: str
+    citedby: int
+    citedby5y: int
+    hindex: int
+    hindex5y: int
+    i10index: int
+    i10index5y: int
+    university_id: int
+
+    def __init__(
+        self,
+        scholar_id: str,
+        profile_picture: str,
+        filtered_name: str,
+        titled_name: str,
+        interests=None,
+        university_id=None,
+        citedby=None,
+        citedby5y=None,
+        hindex5y=None,
+        i10index=None,
+        i10index5y=None,
+    ):
+        self.scholar_id = scholar_id
+        self.profile_picture = profile_picture
+        self.filtered_name = filtered_name
+        self.titled_name = titled_name
+        self.interests = interests
+        self.university_id = university_id
+        self.citedby = citedby
+        self.citedby5y = citedby5y
+        self.hindex5y = hindex5y
+        self.i10index = i10index
+        self.i10index5y = i10index5y
+
+    def __str__(self) -> str:
+        return (
+            f"scholar_id: {self.scholar_id}\n"
+            f"profile_picture: {self.profile_picture}\n"
+            f"filtered_name: {self.filtered_name}\n"
+            f"titled_name: {self.titled_name}\n"
+            f"interests: {self.interests}\n"
+            f"university_id: {self.university_id}\n"
+            f"citedby: {self.citedby}\n"
+            f"citedby5y: {self.citedby5y}\n"
+            f"hindex5y: {self.hindex5y}\n"
+            f"i10index: {self.i10index}\n"
+            f"i10index5y: {self.i10index5y}\n"
+        )
+
+
 def connect_to_database(config: DatabaseConfig):
     try:
         cnx = mysql.connector.connect(
@@ -93,7 +173,7 @@ def extract_column(csv_file, column_index, use_unique=False):
     return column_data
 
 
-def insert_university_data(university: University):
+def insert_university_data(csv_file: str):
     config = read_database_config()
 
     cnx, cur = connect_to_database(config)
@@ -101,16 +181,92 @@ def insert_university_data(university: University):
     if not cnx or not cur:
         raise Exception("cnx and cur not defined")
 
-    insert_query = """
+    org = build_university_from_csv(csv_file)
+
+    universities = set()
+    courses: Course = []
+    with open(csv_file, "r") as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip the header row
+        for row in reader:
+            if len(row) >= 5:
+                university = University(
+                    name=row[0], initials=row[1], href=row[9], scholar=row[8]
+                )
+                universities.add(university)
+
+                course_href = row[2]
+                course_code = row[3]
+                course_name = row[4]
+                course_info = row[5]
+
+                course = Course(
+                    code=course_code,
+                    name=course_name,
+                    info=course_info,
+                    href=course_href,
+                    instructor_id=None,
+                    university_id=None,
+                )
+                courses.append(course)
+
+    insert_university_query = """
     INSERT INTO universities (name, initials, href, scholar)
     VALUES (%s, %s, %s, %s)
     """
+
+    insert_course_query = """
+    INSERT INTO courses (name, code, info, href, universityId)
+    VALUES (%s, %s, %s, %s, %s)
+    """
+
+    if len(universities) > 1:
+        raise Exception("bad csv")
+
+    university = universities.pop()
     cur.execute(
-        insert_query,
+        insert_university_query,
         (university.name, university.initials, university.href, university.scholar),
     )
+    university_id = cur.lastrowid
+
+    #     # Update university_id for courses associated with the university
+    for course in courses:
+        if course.university_id is None:
+            course.university_id = university_id
+
+    for course in courses:
+        cur.execute(
+            insert_course_query,
+            (course.name, course.code, course.info, course.href, course.university_id),
+        )
+
     cnx.commit()
 
     close_connection(cnx, cur)
 
     print("University data inserted successfully!")
+
+
+def build_university_from_csv(csv_file: str) -> University:
+    organization = extract_column(csv_file, 0, True)
+    initials = extract_column(csv_file, 1, True)
+    scholar = extract_column(csv_file, 8, True)
+    href = extract_column(csv_file, 9, True)
+
+    if len(initials) > 1:
+        raise Exception("CSV not correct for standards")
+
+    if len(organization) > 1:
+        raise Exception("CSV not correct for standards")
+
+    if len(scholar) > 1:
+        raise Exception("CSV not correct for standards")
+
+    if len(href) > 1:
+        raise Exception("CSV not correct for standards")
+
+    org = University(
+        href=href[0], initials=initials[0], scholar=scholar[0], name=organization[0]
+    )
+    return org

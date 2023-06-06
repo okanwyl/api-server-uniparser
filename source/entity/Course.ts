@@ -8,7 +8,6 @@ import {
   ManyToOne,
 } from "typeorm";
 import { University } from "./University";
-import { Instructor } from "./Instructor";
 
 @Entity("courses")
 export class Course extends BaseEntity {
@@ -29,9 +28,6 @@ export class Course extends BaseEntity {
 
   @ManyToOne(() => University, (university: University) => university.courses)
   university!: University;
-
-  @ManyToOne(() => Instructor, (instructor: Instructor) => instructor.courses)
-  instructor!: Instructor;
 
   @UpdateDateColumn()
   updated_at!: Date;

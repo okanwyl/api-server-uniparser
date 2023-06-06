@@ -6,7 +6,8 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
   ManyToOne,
-  OneToMany,
+  ManyToMany,
+  JoinTable,
 } from "typeorm";
 import { University } from "./University";
 import { Course } from "./Course";
@@ -23,10 +24,10 @@ export class Instructor extends BaseEntity {
   profile_picture!: string;
 
   @Column()
-  name!: string;
+  filtered_name!: string;
 
   @Column({ default: "Not available" })
-  title!: string;
+  titled_name!: string;
 
   @Column("text", { nullable: true })
   interests!: string[];
@@ -85,9 +86,8 @@ export class Instructor extends BaseEntity {
   )
   university!: University;
 
-  @OneToMany(() => Course, (course) => course.instructor, {
-    cascade: true,
-  })
+  @ManyToMany(() => Course)
+  @JoinTable()
   courses!: Course[];
 
   @UpdateDateColumn()
