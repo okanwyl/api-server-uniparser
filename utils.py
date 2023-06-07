@@ -3,6 +3,7 @@ from typing import NamedTuple
 import mysql.connector
 from dotenv import load_dotenv
 import os
+import scholarly
 
 load_dotenv()
 
@@ -40,6 +41,7 @@ class University(NamedTuple):
 
 
 class Course:
+    course_id: str
     name: str
     code: str
     info: str
@@ -56,6 +58,7 @@ class Course:
     def __str__(self) -> str:
         return (
             f"name: {self.name}\n"
+            f"course_id: {self.course_id}\n"
             f"code: {self.code}\n"
             f"info: {self.info}\n"
             f"href: {self.href}\n"
@@ -76,13 +79,15 @@ class Instructor:
     i10index: int
     i10index5y: int
     university_id: int
+    course_name: str
+    db_uid: str
 
     def __init__(
         self,
-        scholar_id: str,
-        profile_picture: str,
-        filtered_name: str,
-        titled_name: str,
+        filtered_name=None,
+        titled_name=None,
+        scholar_id=None,
+        profile_picture=None,
         interests=None,
         university_id=None,
         citedby=None,
@@ -90,6 +95,8 @@ class Instructor:
         hindex5y=None,
         i10index=None,
         i10index5y=None,
+        db_uid=None,
+        course_name=None,
     ):
         self.scholar_id = scholar_id
         self.profile_picture = profile_picture
@@ -102,6 +109,8 @@ class Instructor:
         self.hindex5y = hindex5y
         self.i10index = i10index
         self.i10index5y = i10index5y
+        self.course_name = course_name
+        self.db_uid = db_uid
 
     def __str__(self) -> str:
         return (
@@ -116,6 +125,8 @@ class Instructor:
             f"hindex5y: {self.hindex5y}\n"
             f"i10index: {self.i10index}\n"
             f"i10index5y: {self.i10index5y}\n"
+            f"course_name: {self.course_name}\n"
+            f"db_uid: {self.db_uid}\n"
         )
 
 
@@ -184,7 +195,8 @@ def insert_university_data(csv_file: str):
     org = build_university_from_csv(csv_file)
 
     universities = set()
-    courses: Course = []
+    courses = set()
+    instructors = set()
     with open(csv_file, "r") as file:
         reader = csv.reader(file)
         next(reader)  # Skip the header row
@@ -200,6 +212,9 @@ def insert_university_data(csv_file: str):
                 course_name = row[4]
                 course_info = row[5]
 
+                full_name = row[6]
+                filtered_name = row[7]
+
                 course = Course(
                     code=course_code,
                     name=course_name,
@@ -208,7 +223,14 @@ def insert_university_data(csv_file: str):
                     instructor_id=None,
                     university_id=None,
                 )
-                courses.append(course)
+
+                instructor = Instructor(
+                    titled_name=full_name, filtered_name=filtered_name
+                )
+
+                instructor.course_name = course.name
+                courses.add(course)
+                instructors.add(instructor)
 
     insert_university_query = """
     INSERT INTO universities (name, initials, href, scholar)
@@ -218,6 +240,16 @@ def insert_university_data(csv_file: str):
     insert_course_query = """
     INSERT INTO courses (name, code, info, href, universityId)
     VALUES (%s, %s, %s, %s, %s)
+    """
+
+    insert_instructor_query = """
+    INSERT INTO  instructors (filtered_name, titled_name, universityId)
+    VALUES (%s, %s, %s)
+    """
+
+    insert_instructors_courses_courses = """
+    INSERT INTO instructors_courses_courses (instructorsId, coursesId)
+    VALUES (%s, %s)
     """
 
     if len(universities) > 1:
@@ -230,18 +262,45 @@ def insert_university_data(csv_file: str):
     )
     university_id = cur.lastrowid
 
-    #     # Update university_id for courses associated with the university
     for course in courses:
         if course.university_id is None:
             course.university_id = university_id
 
+    visited_inst = set()
     for course in courses:
         cur.execute(
             insert_course_query,
             (course.name, course.code, course.info, course.href, course.university_id),
         )
+        course_id = cur.lastrowid
+        course.course_id = course_id
 
-    cnx.commit()
+        cnx.commit()
+
+    for course in courses:
+        try:
+            instrc = find_instructor_by_course(instructors, "course_name", course.name)
+            for inst in instrc:
+                try_find_on_db = find_instructor_by_filtered_name(inst.filtered_name)
+                if try_find_on_db is None:
+                    cur.execute(
+                        insert_instructor_query,
+                        (inst.filtered_name, inst.titled_name, university_id),
+                    )
+                    inst.db_uid = cur.lastrowid
+                    cur.execute(
+                        insert_instructors_courses_courses,
+                        (inst.db_uid, course.course_id),
+                    )
+                    cnx.commit()
+                else:
+                    cur.execute(
+                        insert_instructors_courses_courses,
+                        (try_find_on_db.db_uid, course.course_id),
+                    )
+                    cnx.commit()
+        except:
+            continue
 
     close_connection(cnx, cur)
 
@@ -270,3 +329,44 @@ def build_university_from_csv(csv_file: str) -> University:
         href=href[0], initials=initials[0], scholar=scholar[0], name=organization[0]
     )
     return org
+
+
+# Find objects based on a field value
+def find_instructor_by_course(courses, field, value):
+    matching_courses = set()
+    for course in courses:
+        if getattr(course, field) == value:
+            matching_courses.add(course)
+    return matching_courses
+
+
+def find_instructor_by_filtered_name(filtered_name):
+    config = read_database_config()
+    cnx, cur = connect_to_database(config)
+
+    if not cnx or not cur:
+        raise Exception("cnx and cur not defined")
+
+    query = """
+    SELECT
+        instructors.id
+    FROM
+        instructors
+    WHERE
+        instructors.filtered_name = %s
+    LIMIT 1
+    """
+
+    cur.execute(query, (filtered_name,))
+    result = cur.fetchone()
+
+    if result:
+        instructor = Instructor(
+            db_uid=result[0],
+        )
+    else:
+        instructor = None
+
+    close_connection(cnx, cur)
+
+    return instructor

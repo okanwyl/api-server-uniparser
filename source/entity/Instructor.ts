@@ -17,20 +17,20 @@ export class Instructor extends BaseEntity {
   @PrimaryGeneratedColumn("increment")
   id!: number;
 
-  @Column({ unique: true })
+  @Column({ default: "", nullable: true })
   scholar_id!: string;
 
-  @Column("longtext")
+  @Column({ nullable: true, default: " ", length: 5000 })
   profile_picture!: string;
 
-  @Column()
+  @Column({ unique: true })
   filtered_name!: string;
 
-  @Column({ default: "Not available" })
+  @Column({ default: "", nullable: true })
   titled_name!: string;
 
-  @Column("text", { nullable: true })
-  interests!: string[];
+  @Column({ nullable: true, default: "", length: 5000 })
+  interests!: string;
 
   @Column({
     type: "int",
