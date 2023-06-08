@@ -5,7 +5,6 @@ from typing import NamedTuple
 import mysql.connector
 from dotenv import load_dotenv
 import os
-from scholarly import scholarly
 
 load_dotenv()
 
@@ -202,6 +201,11 @@ def read_database_config() -> DatabaseConfig:
     )
 
     return db
+
+
+def read_scraper_api_key() -> str:
+    api_key = os.getenv("SCRAPERAPI_KEY")
+    return api_key
 
 
 def extract_column(csv_file, column_index, use_unique=False):
@@ -493,7 +497,7 @@ def update_instructor_object(instructor: Instructor):
     cnx.commit()
 
 
-def parse_scholarly(filtered_name: str, university_initials: str) -> json:
+def parse_scholarly(scholarly, filtered_name: str, university_initials: str) -> json:
     try:
         search_query = scholarly.search_author(
             filtered_name + ", " + university_initials

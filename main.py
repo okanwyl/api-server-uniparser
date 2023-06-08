@@ -1,4 +1,5 @@
 import random
+import sys
 import time
 from utils import (
     Publication,
@@ -6,11 +7,13 @@ from utils import (
     get_all_instructors,
     insert_university_data,
     parse_scholarly,
+    read_scraper_api_key,
     update_instructor_object,
 )
 import json
 import click
 from unidecode import unidecode
+from scholarly import scholarly, ProxyGenerator
 
 
 @click.command(no_args_is_help=True)
@@ -39,15 +42,25 @@ def app(filename, initials, do_not_use_scholarly, do_not_insert_csv):
         inserted_filename = f"./dataset/{filename}.csv"
         insert_university_data(inserted_filename)
     if do_not_use_scholarly is False:
-        print("hi")
         instructors = get_all_instructors()
+        pg = ProxyGenerator()
+        API_KEY = read_scraper_api_key()
+        success = pg.ScraperAPI(API_KEY)
+        if success is False:
+            sys.exit("API Key is not successfully used")
+        scholarly.use_proxy(pg)
         for instructor in instructors:
             # put sleep here!
+            print(instructor.filtered_name)
             random_wait = random.uniform(60, 2 * 60)
             time.sleep(random_wait)
-            json_str = parse_scholarly(instructor.filtered_name, str(initials))
+            json_str = parse_scholarly(
+                scholarly, instructor.filtered_name, str(initials)
+            )
             if json_str is None:
-              json_str = parse_scholarly(unidecode(instructor.filtered_name, str(initials)))
+                json_str = parse_scholarly(
+                    unidecode(instructor.filtered_name), str(initials)
+                )
             if json_str is not None:
                 json_object = json.loads(json_str)
                 instructor.scholar_id = json_object["scholar_id"]
