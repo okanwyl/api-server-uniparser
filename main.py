@@ -10,6 +10,7 @@ from utils import (
 )
 import json
 import click
+from unidecode import unidecode
 
 
 @click.command(no_args_is_help=True)
@@ -45,6 +46,8 @@ def app(filename, initials, do_not_use_scholarly, do_not_insert_csv):
             random_wait = random.uniform(60, 2 * 60)
             time.sleep(random_wait)
             json_str = parse_scholarly(instructor.filtered_name, str(initials))
+            if json_str is None:
+              json_str = parse_scholarly(unidecode(instructor.filtered_name, str(initials)))
             if json_str is not None:
                 json_object = json.loads(json_str)
                 instructor.scholar_id = json_object["scholar_id"]
