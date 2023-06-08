@@ -10,5 +10,6 @@ export class CourseRoute {
   }
   routes(): void {
     this.router.get("/course/", CourseController.getCourse);
+    this.router.get("/course/:id", CourseController.getCourseByID);
   }
 }
