@@ -1,9 +1,10 @@
-import { DataSource, Unique } from "typeorm";
+import { DataSource } from "typeorm";
 import dotenv from "dotenv";
 import { University } from "./entity/University";
 import { Course } from "./entity/Course";
 import "reflect-metadata";
 import { Instructor } from "./entity/Instructor";
+import { Publication } from "./entity/Publication";
 dotenv.config();
 
 function buildDatabaseConfigFromSource(): {
@@ -58,7 +59,7 @@ const databaseSource = new DataSource({
   logger: "simple-console",
   synchronize: true,
   cache: true,
-  entities: [University, Course, Instructor],
+  entities: [University, Course, Instructor, Publication],
 });
 
 export default databaseSource;

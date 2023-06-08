@@ -8,9 +8,11 @@ import {
   ManyToOne,
   ManyToMany,
   JoinTable,
+  OneToMany,
 } from "typeorm";
 import { University } from "./University";
 import { Course } from "./Course";
+import { Publication } from "./Publication";
 
 @Entity("instructors")
 export class Instructor extends BaseEntity {
@@ -29,53 +31,59 @@ export class Instructor extends BaseEntity {
   @Column({ default: "", nullable: true })
   titled_name!: string;
 
+  @Column({ default: "", nullable: true })
+  affilation!: string;
+
+  @Column({ default: "", nullable: true })
+  email_domain!: string;
+
   @Column({ nullable: true, default: "", length: 5000 })
   interests!: string;
 
   @Column({
     type: "int",
-    unsigned: true,
     nullable: true,
+    unsigned: true,
     default: 0,
   })
   citedby!: number;
 
   @Column({
     type: "int",
-    unsigned: true,
     nullable: true,
+    unsigned: true,
     default: 0,
   })
   citedby5y!: number;
 
   @Column({
     type: "int",
-    unsigned: true,
     nullable: true,
+    unsigned: true,
     default: 0,
   })
   hindex!: number;
 
   @Column({
     type: "int",
-    unsigned: true,
     nullable: true,
+    unsigned: true,
     default: 0,
   })
   hindex5y!: number;
 
   @Column({
     type: "int",
-    unsigned: true,
     nullable: true,
+    unsigned: true,
     default: 0,
   })
   i10index!: number;
 
   @Column({
     type: "int",
-    unsigned: true,
     nullable: true,
+    unsigned: true,
     default: 0,
   })
   i10index5y!: number;
@@ -89,6 +97,17 @@ export class Instructor extends BaseEntity {
   @ManyToMany(() => Course)
   @JoinTable()
   courses!: Course[];
+
+  @Column("boolean", { default: false })
+  parsable!: boolean;
+
+  @Column("boolean", { default: false })
+  visited!: boolean;
+
+  @OneToMany(() => Publication, (publication) => publication.instructor, {
+    cascade: true,
+  })
+  publications!: Publication[];
 
   @UpdateDateColumn()
   updated_at!: Date;

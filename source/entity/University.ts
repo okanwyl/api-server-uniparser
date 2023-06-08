@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { Course } from "./Course";
 import { Instructor } from "./Instructor";
+import { Publication } from "./Publication";
 
 @Entity("universities")
 export class University extends BaseEntity {
@@ -44,6 +45,11 @@ export class University extends BaseEntity {
     cascade: true,
   })
   instructors!: Instructor[];
+
+  @OneToMany(() => Publication, (publication) => publication.university, {
+    cascade: true,
+  })
+  publications!: Publication[];
 
   @UpdateDateColumn()
   updated_at!: Date;

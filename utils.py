@@ -1,9 +1,11 @@
+import json
+from typing import List
 import csv
 from typing import NamedTuple
 import mysql.connector
 from dotenv import load_dotenv
 import os
-import scholarly
+from scholarly import scholarly
 
 load_dotenv()
 
@@ -81,6 +83,10 @@ class Instructor:
     university_id: int
     course_name: str
     db_uid: str
+    parsable: bool
+    visited: bool
+    affilation: str
+    email_domain: str
 
     def __init__(
         self,
@@ -92,11 +98,16 @@ class Instructor:
         university_id=None,
         citedby=None,
         citedby5y=None,
+        hindex=None,
         hindex5y=None,
         i10index=None,
         i10index5y=None,
         db_uid=None,
         course_name=None,
+        parsable=False,
+        visited=False,
+        affilation=None,
+        email_domain=None,
     ):
         self.scholar_id = scholar_id
         self.profile_picture = profile_picture
@@ -106,11 +117,16 @@ class Instructor:
         self.university_id = university_id
         self.citedby = citedby
         self.citedby5y = citedby5y
+        self.hindex = hindex
         self.hindex5y = hindex5y
         self.i10index = i10index
         self.i10index5y = i10index5y
         self.course_name = course_name
+        self.parsable = parsable
+        self.visited = visited
         self.db_uid = db_uid
+        self.affilation = affilation
+        self.email_domain = email_domain
 
     def __str__(self) -> str:
         return (
@@ -128,6 +144,25 @@ class Instructor:
             f"course_name: {self.course_name}\n"
             f"db_uid: {self.db_uid}\n"
         )
+
+
+class Publication:
+    title: str
+    citation: str
+    author_pub_id: str
+    num_citation: int
+    instructor_id: str
+    university_id: str
+
+    def __init__(
+        self, title, citation, author_pub_id, num_citation, instructor_id, university_id
+    ):
+        self.title = title
+        self.citation = citation
+        self.author_pub_id = author_pub_id
+        self.num_citation = num_citation
+        self.instructor_id = instructor_id
+        self.university_id = university_id
 
 
 def connect_to_database(config: DatabaseConfig):
@@ -370,3 +405,129 @@ def find_instructor_by_filtered_name(filtered_name):
     close_connection(cnx, cur)
 
     return instructor
+
+
+def get_all_instructors() -> List[Instructor]:
+    config = read_database_config()
+    cnx, cur = connect_to_database(config)
+
+    if not cnx or not cur:
+        raise Exception("cnx and cur not defined")
+
+    query = "SELECT * FROM instructors WHERE visited = 0;"
+    cur.execute(query)
+    rows = cur.fetchall()
+
+    instructors = []
+    for row in rows:
+        instructor = Instructor(
+            db_uid=row[0],
+            filtered_name=row[11],
+            titled_name=row[12],
+            scholar_id=row[1],
+            profile_picture=row[13],
+            interests=row[14],
+            citedby=row[2],
+            citedby5y=row[3],
+            hindex=row[4],
+            hindex5y=row[5],
+            i10index=row[6],
+            i10index5y=row[7],
+            university_id=row[10],
+        )
+        instructors.append(instructor)
+
+    close_connection(cnx, cur)
+
+    return instructors
+
+
+def update_instructor_object(instructor: Instructor):
+    config = read_database_config()
+    cnx, cur = connect_to_database(config)
+
+    if not cnx or not cur:
+        raise Exception("cnx and cur not defined")
+
+    update_instructor_query = """
+    UPDATE instructors SET
+    filtered_name = %s,
+    titled_name = %s,
+    scholar_id = %s,
+    profile_picture = %s,
+    interests = %s,
+    citedby = %s,
+    citedby5y = %s,
+    hindex = %s,
+    hindex5y = %s,
+    i10index = %s,
+    i10index5y = %s,
+    parsable = %s,
+    visited = %s,
+    affilation = %s,
+    email_domain = %s
+    WHERE id = %s
+    """
+
+    cur.execute(
+        update_instructor_query,
+        (
+            instructor.filtered_name,
+            instructor.titled_name,
+            instructor.scholar_id,
+            instructor.profile_picture,
+            instructor.interests,
+            instructor.citedby,
+            instructor.citedby5y,
+            instructor.hindex,
+            instructor.hindex5y,
+            instructor.i10index,
+            instructor.i10index5y,
+            instructor.parsable,
+            instructor.visited,
+            instructor.affilation,
+            instructor.email_domain,
+            instructor.db_uid,
+        ),
+    )
+    cnx.commit()
+
+
+def parse_scholarly(filtered_name: str, university_initials: str) -> json:
+    try:
+        search_query = scholarly.search_author(
+            filtered_name + ", " + university_initials
+        )
+        author = next(search_query)
+
+        obj = scholarly.fill(author, sections=["basics", "indices", "publications"])
+        json_str = json.dumps(obj, indent=4, ensure_ascii=False)
+        return json_str
+
+    except StopIteration:
+        return None
+
+
+def create_publication_from_obj(obj: Publication):
+    config = read_database_config()
+    cnx, cur = connect_to_database(config)
+
+    if not cnx or not cur:
+        raise Exception("cnx and cur not defined")
+
+    insert_publication_query = """
+    INSERT INTO  publications (title, citation, author_pub_id, num_citations, instructorId, universityId)
+    VALUES (%s, %s, %s, %s, %s, %s)
+    """
+    cur.execute(
+        insert_publication_query,
+        (
+            obj.title,
+            obj.citation,
+            obj.author_pub_id,
+            obj.num_citation,
+            obj.instructor_id,
+            obj.university_id,
+        ),
+    )
+    cnx.commit()
