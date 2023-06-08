@@ -27,9 +27,16 @@ import click
     is_flag=True,
     show_default=True,
 )
-def app(filename, initials, do_not_use_scholarly):
-    inserted_filename = f"./dataset/{filename}.csv"
-    insert_university_data(inserted_filename)
+@click.option(
+    "--do-not-insert-csv",
+    help="Disables insertion filtered csv",
+    is_flag=True,
+    show_default=True,
+)
+def app(filename, initials, do_not_use_scholarly, do_not_insert_csv):
+    if do_not_insert_csv is False:
+        inserted_filename = f"./dataset/{filename}.csv"
+        insert_university_data(inserted_filename)
     if do_not_use_scholarly is False:
         print("hi")
         instructors = get_all_instructors()
@@ -37,7 +44,7 @@ def app(filename, initials, do_not_use_scholarly):
             # put sleep here!
             random_wait = random.uniform(60, 2 * 60)
             time.sleep(random_wait)
-            json_str = parse_scholarly(instructor.filtered_name, initials)
+            json_str = parse_scholarly(instructor.filtered_name, str(initials))
             if json_str is not None:
                 json_object = json.loads(json_str)
                 instructor.scholar_id = json_object["scholar_id"]
