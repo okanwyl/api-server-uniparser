@@ -45,7 +45,7 @@ def app(filename, initials, do_not_use_scholarly, do_not_insert_csv):
         instructors = get_all_instructors()
         pg = ProxyGenerator()
         API_KEY = read_scraper_api_key()
-        success = pg.ScraperAPI(API_KEY)
+        success = pg.ScraperAPI(str(API_KEY))
         if success is False:
             sys.exit("API Key is not successfully used")
         scholarly.use_proxy(pg)
@@ -59,7 +59,7 @@ def app(filename, initials, do_not_use_scholarly, do_not_insert_csv):
             )
             if json_str is None:
                 json_str = parse_scholarly(
-                    unidecode(instructor.filtered_name), str(initials)
+                    scholarly, unidecode(instructor.filtered_name), str(initials)
                 )
             if json_str is not None:
                 json_object = json.loads(json_str)
