@@ -46,6 +46,18 @@ class CourseRepository {
     const courseCount = parseInt(queryResult.count, 10);
     return courseCount;
   }
+
+  async getCourseCount(): Promise<number> {
+    const queryResult = await courseRepository
+      .createQueryBuilder('course')
+      .select('COUNT(course.id)', 'count')
+      .cache(30000)
+      .getRawOne();
+
+    const courseCount = parseInt(queryResult.count, 10);
+    return courseCount;
+
+  }
 }
 
 export default new CourseRepository();

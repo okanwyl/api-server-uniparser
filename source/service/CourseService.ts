@@ -24,6 +24,10 @@ class CourseService {
     const count = await CourseRepository.getCourseCountByUniversityID(id);
     return count;
   }
+
+  async getCourseCountService() {
+    return await CourseRepository.getCourseCount();
+  }
 }
 
 export default new CourseService();
