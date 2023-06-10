@@ -8,5 +8,6 @@ dotenv.config();
   await databaseSource.initialize();
 
   const server = new APIServer();
+  server.config();
   server.start();
 })();
