@@ -11,5 +11,6 @@ export class UniversityRoute {
     this.router.get("/university/", UniversityController.getUniversity);
     this.router.get("/university/:id", UniversityController.getUniversityByIDHandler);
     this.router.get("/university/:id/parameter", UniversityController.getParameterByIDHandler);
+    this.router.get("/metric/university", UniversityController.getGlobalInstructorMetric);
   }
 }

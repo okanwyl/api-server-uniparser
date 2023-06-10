@@ -27,6 +27,14 @@ class InstructorService {
   async getAllCourses() {
     return await InstructorRepository.getAllInstructors();
   }
+
+  async getParseableInstructors() {
+    return await InstructorRepository.getParseableInstructorCount();
+  }
+
+  async getNotParseableInstructors() {
+    return await InstructorRepository.getNotParseableInstructorCount();
+  }
 }
 
 export default new InstructorService();

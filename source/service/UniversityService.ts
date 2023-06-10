@@ -30,6 +30,13 @@ class UniversityService {
     return { instructors: instructorCount, courses: courseCount, publications: publicationCount };
 
   }
+
+  async getGlobalUniversityMetric(): Promise<{ parseable: number, notParseable: number }> {
+    const parseable = await InstructorService.getParseableInstructors();
+    const notParseable = await InstructorService.getNotParseableInstructors();
+    return { parseable, notParseable };
+
+  }
 }
 
 export default new UniversityService();

@@ -32,6 +32,27 @@ export class UniversityController {
     }
   }
 
+  public static async getGlobalInstructorMetric(
+    req: Request,
+    res: Response
+  ): Promise<void> {
+    try {
+      const universities = await UniversityService.getGlobalUniversityMetric();
+      res.status(200).send({
+        message: "All available instructor metrics",
+        success: true,
+        data: universities,
+      });
+      return;
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({
+        message: "INTERNAL SERVER ERROR, please try again later.",
+        success: false,
+      });
+    }
+  }
+
   public static async getUniversityByIDHandler(req: Request, res: Response): Promise<void> {
     try {
       const id = req.params.id;
