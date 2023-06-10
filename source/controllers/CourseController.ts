@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import CourseService from "../service/CourseService";
+import { CourseNotFound } from "../types/Errors";
 
 export class CourseController {
   public static async getCourse(req: Request, res: Response): Promise<void> {
@@ -33,12 +34,17 @@ export class CourseController {
         return;
       }
       const courses = await CourseService.findCourseByIDOrFail(Number(id));
-      res.status(200).send({
+      res.status(200).json({
         message: "Fetched course",
         success: true,
         data: courses,
       });
     } catch (err) {
+      if (err instanceof CourseNotFound) {
+        res.status(404).json({
+          message: "Not found."
+        }).end()
+      }
       console.log(err);
       res.status(500).send({
         message: "INTERNAL SERVER ERROR, please try again later.",

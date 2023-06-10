@@ -33,6 +33,19 @@ class CourseRepository {
   async getAllCourses(): Promise<Course[]> {
     return await courseRepository.find({});
   }
+
+  async getCourseCountByUniversityID(universityId: number): Promise<number> {
+    const queryResult = await courseRepository
+      .createQueryBuilder('course')
+      .select('COUNT(course.id)', 'count')
+      .where('course.universityId = :universityId', { universityId })
+      .getRawOne();
+
+    console.log(queryResult);
+
+    const courseCount = parseInt(queryResult.count, 10);
+    return courseCount;
+  }
 }
 
 export default new CourseRepository();

@@ -13,6 +13,7 @@ class APIServer {
   constructor() {
     this.app = express();
     this.routes();
+    this.config();
   }
 
   public routes(): void {

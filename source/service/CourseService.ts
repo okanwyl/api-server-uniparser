@@ -1,5 +1,6 @@
 import { Course } from "../entity/Course";
 import CourseRepository from "../repository/CourseRepository";
+import { CourseNotFound } from "../types/Errors";
 
 class CourseService {
   async createCourseServiceOrFail(input: Partial<Course>): Promise<Course> {
@@ -10,13 +11,18 @@ class CourseService {
     const checked = await CourseRepository.findCourseByID(id);
 
     if (!checked) {
-      throw new UniversityNotFound("University already exist");
+      throw new CourseNotFound("University already exist");
     }
     return checked;
   }
 
   async getAllCourses() {
     return await CourseRepository.getAllCourses();
+  }
+
+  async findCourseCountByUniversityID(id: number): Promise<number> {
+    const checked = await CourseRepository.getCourseCountByUniversityID(id);
+    return checked;
   }
 }
 

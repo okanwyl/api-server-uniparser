@@ -1,5 +1,6 @@
 import { Instructor } from "../entity/Instructor";
 import InstructorRepository from "../repository/InstructorRepository";
+import { InstructorNotFound } from "../types/Errors";
 
 class InstructorService {
   async createInstructorServiceOrFail(
@@ -12,8 +13,14 @@ class InstructorService {
     const checked = await InstructorRepository.findInstructorByID(id);
 
     if (!checked) {
-      throw new UniversityNotFound("University already exist");
+      throw new InstructorNotFound("University already exist");
     }
+    return checked;
+  }
+
+  async findInstructorCountByUniversityID(id: number): Promise<number> {
+    const checked = await InstructorRepository.getInstructorCountByUniversityID(id);
+
     return checked;
   }
 

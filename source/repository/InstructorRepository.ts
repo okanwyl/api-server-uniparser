@@ -17,6 +17,20 @@ class InstructorRepository {
     });
   }
 
+  async getInstructorCountByUniversityID(universityId: number): Promise<number> {
+    const queryResult = await instructorRepository
+      .createQueryBuilder('instructor')
+      .select('COUNT(instructor.id)', 'count')
+      .where('instructor.universityId = :universityId', { universityId })
+      .getRawOne();
+
+
+    const instructorCount = parseInt(queryResult.count, 10);
+    return instructorCount;
+
+
+  }
+
   async getAllInstructors(): Promise<Instructor[]> {
     return await instructorRepository.find({});
   }

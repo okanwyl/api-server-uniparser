@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import PublicationService from "../service/PublicationService";
+import { PublicationNotFound } from "../types/Errors";
 
 export class PublicationController {
   public static async getPublication(
@@ -15,6 +16,11 @@ export class PublicationController {
       });
     } catch (err) {
       console.log(err);
+      if (err instanceof PublicationNotFound) {
+        res.status(404).json({
+          message: "Not found."
+        }).end()
+      }
       res.status(500).send({
         message: "INTERNAL SERVER ERROR, please try again later.",
         success: false,

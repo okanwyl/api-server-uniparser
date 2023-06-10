@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 import UniversityService from "../service/UniversityService";
+import { UniversityNotFound } from "../types/Errors"
+import InstructorService from "../service/InstructorService";
+import CourseService from "../service/CourseService";
 
 export class UniversityController {
   public static async getUniversity(
@@ -13,7 +16,79 @@ export class UniversityController {
         success: true,
         data: universities,
       });
+      return;
     } catch (err) {
+      if (err instanceof UniversityNotFound) {
+        res.status(404).json({
+          message: "Not found."
+        })
+        return;
+      }
+      console.log(err);
+      res.status(500).send({
+        message: "INTERNAL SERVER ERROR, please try again later.",
+        success: false,
+      });
+    }
+  }
+
+  public static async getUniversityByIDHandler(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id;
+      if (isNaN(Number(id))) {
+        res.status(400).send({
+          message: "Bad request parameter",
+          success: false,
+        });
+        return;
+      }
+      const university = await UniversityService.findUniversityByIDOrFail(Number(id));
+      res.status(200).json({
+        message: "Fetched university",
+        success: true,
+        data: university,
+      });
+      return;
+
+    } catch (err) {
+      if (err instanceof UniversityNotFound) {
+        res.status(404).json({
+          message: "Not found."
+        }).end()
+        return;
+      }
+      console.log(err);
+      res.status(500).send({
+        message: "INTERNAL SERVER ERROR, please try again later.",
+        success: false,
+      });
+    }
+  }
+  public static async getParameterByIDHandler(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id;
+      if (isNaN(Number(id))) {
+        res.status(400).send({
+          message: "Bad request parameter",
+          success: false,
+        });
+        return;
+      }
+      const university = await UniversityService.findUniversityAndFetchParameters(Number(id));
+      res.status(200).json({
+        message: "Fetched university",
+        success: true,
+        university
+      });
+      return;
+
+    } catch (err) {
+      if (err instanceof UniversityNotFound) {
+        res.status(404).json({
+          message: "Not found."
+        }).end()
+        return;
+      }
       console.log(err);
       res.status(500).send({
         message: "INTERNAL SERVER ERROR, please try again later.",

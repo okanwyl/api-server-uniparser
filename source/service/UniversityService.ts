@@ -1,15 +1,10 @@
-import databaseSource from "../database";
 import { University } from "../entity/University";
 import UniversityRepository from "../repository/UniversityRepository";
+import { UniversityNotFound } from "../types/Errors";
+import CourseService from "./CourseService";
+import InstructorService from "./InstructorService";
 
 class UniversityService {
-  async createUniversityServiceOrFail(
-    input: Partial<University>
-  ): Promise<University> {
-    // Check the university does exist
-    return await UniversityRepository.createUniversity(input);
-  }
-
   async findUniversityByIDOrFail(id: number): Promise<University> {
     const checked = await UniversityRepository.findUniversityByIDOrFail(id);
 
@@ -21,6 +16,18 @@ class UniversityService {
 
   async getAllUniversities() {
     return await UniversityRepository.getAllUniversities();
+  }
+
+  async findUniversityAndFetchParameters(id: number): Promise<{ instructorCount: number, courseCount: number }> {
+    const instructorCount = await InstructorService.findInstructorCountByUniversityID(id);
+    const courseCount = await CourseService.findCourseCountByUniversityID(id);
+    console.log(courseCount);
+
+    if (!instructorCount) {
+      throw new UniversityNotFound("University already exist");
+    }
+    return { instructorCount, courseCount };
+
   }
 }
 
