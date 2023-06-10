@@ -19,9 +19,9 @@ class InstructorService {
   }
 
   async findInstructorCountByUniversityID(id: number): Promise<number> {
-    const checked = await InstructorRepository.getInstructorCountByUniversityID(id);
+    const count = await InstructorRepository.getInstructorCountByUniversityID(id);
 
-    return checked;
+    return count;
   }
 
   async getAllCourses() {

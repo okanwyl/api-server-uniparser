@@ -39,9 +39,9 @@ class CourseRepository {
       .createQueryBuilder('course')
       .select('COUNT(course.id)', 'count')
       .where('course.universityId = :universityId', { universityId })
+      .cache(30000)
       .getRawOne();
 
-    console.log(queryResult);
 
     const courseCount = parseInt(queryResult.count, 10);
     return courseCount;

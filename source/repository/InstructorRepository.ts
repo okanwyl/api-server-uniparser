@@ -22,6 +22,7 @@ class InstructorRepository {
       .createQueryBuilder('instructor')
       .select('COUNT(instructor.id)', 'count')
       .where('instructor.universityId = :universityId', { universityId })
+      .cache(30000)
       .getRawOne();
 
 

@@ -18,6 +18,12 @@ class PublicationService {
     return checked;
   }
 
+  async findPublicationCountByUniversityID(id: number): Promise<number> {
+    const count = await PublicationRepository.getPublicationCountByUniversityID(id);
+
+    return count;
+  }
+
   async getAllPublications() {
     return await PublicationRepository.getAllPublications();
   }

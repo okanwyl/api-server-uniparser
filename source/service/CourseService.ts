@@ -21,8 +21,8 @@ class CourseService {
   }
 
   async findCourseCountByUniversityID(id: number): Promise<number> {
-    const checked = await CourseRepository.getCourseCountByUniversityID(id);
-    return checked;
+    const count = await CourseRepository.getCourseCountByUniversityID(id);
+    return count;
   }
 }
 

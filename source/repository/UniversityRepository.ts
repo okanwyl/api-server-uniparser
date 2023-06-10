@@ -1,5 +1,8 @@
 import databaseSource from "../database";
 import { University } from "../entity/University";
+import CourseRepository from "./CourseRepository";
+import InstructorRepository from "./InstructorRepository";
+import PublicationRepository from "./PublicationRepository";
 
 // Initialize repository.
 const universityRepository = databaseSource.getRepository(University);

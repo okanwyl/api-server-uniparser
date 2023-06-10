@@ -74,11 +74,11 @@ export class UniversityController {
         });
         return;
       }
-      const university = await UniversityService.findUniversityAndFetchParameters(Number(id));
+      const data = await UniversityService.findUniversityAndFetchParameters(Number(id));
       res.status(200).json({
         message: "Fetched university",
         success: true,
-        university
+        data
       });
       return;
 
