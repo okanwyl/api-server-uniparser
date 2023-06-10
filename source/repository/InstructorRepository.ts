@@ -14,6 +14,11 @@ class InstructorRepository {
       where: {
         id: id,
       },
+      relations: {
+        university: true,
+        courses: true,
+        publications: true
+      }
     });
   }
 
