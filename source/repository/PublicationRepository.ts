@@ -35,6 +35,19 @@ class PublicationRepository {
     return instructorCount;
 
   }
+
+  async getPublicationCount(): Promise<number> {
+    const queryResult = await publicationRepository
+      .createQueryBuilder('publication')
+      .select('COUNT(publication.id)', 'count')
+      .cache(30000)
+      .getRawOne();
+
+    const publicationCount = parseInt(queryResult.count, 10);
+    return publicationCount;
+
+  }
+
 }
 
 export default new PublicationRepository();

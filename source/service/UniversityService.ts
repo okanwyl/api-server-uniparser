@@ -31,10 +31,11 @@ class UniversityService {
 
   }
 
-  async getGlobalUniversityMetric(): Promise<{ parseable: number, notParseable: number }> {
+  async getGlobalUniversityMetric(): Promise<{ parseable: number, notParseable: number, publicationCount: number }> {
     const parseable = await InstructorService.getParseableInstructors();
     const notParseable = await InstructorService.getNotParseableInstructors();
-    return { parseable, notParseable };
+    const publicationCount = await PublicationService.getPublicationCount();
+    return { parseable, notParseable, publicationCount };
 
   }
 }

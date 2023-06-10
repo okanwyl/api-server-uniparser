@@ -27,6 +27,9 @@ class PublicationService {
   async getAllPublications() {
     return await PublicationRepository.getAllPublications();
   }
+  async getPublicationCount() {
+    return await PublicationRepository.getPublicationCount();
+  }
 }
 
 export default new PublicationService();
