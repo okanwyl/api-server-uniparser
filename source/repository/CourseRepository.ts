@@ -34,7 +34,10 @@ class CourseRepository {
   }
 
   async getAllCourses(): Promise<Course[]> {
-    return await courseRepository.find({});
+    return await courseRepository.find({
+      cache: true
+
+    });
   }
 
   async getCourseCountByUniversityID(universityId: number): Promise<number> {

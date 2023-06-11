@@ -21,7 +21,7 @@ class UniversityRepository {
   }
 
   async getAllUniversities(): Promise<University[]> {
-    return await universityRepository.find({});
+    return await universityRepository.find({ cache: true });
   }
 }
 

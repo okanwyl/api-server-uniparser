@@ -19,7 +19,7 @@ class PublicationRepository {
   }
 
   async getAllPublications(): Promise<Publication[]> {
-    return await publicationRepository.find({});
+    return await publicationRepository.find({ cache: true });
   }
 
   async getPublicationCountByUniversityID(universityId: number): Promise<number> {
