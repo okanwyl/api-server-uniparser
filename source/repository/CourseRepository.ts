@@ -16,6 +16,9 @@ class CourseRepository {
       where: {
         id: id,
       },
+      relations: {
+        university: true
+      }
     });
 
     if (course !== null) {
@@ -57,6 +60,16 @@ class CourseRepository {
     const courseCount = parseInt(queryResult.count, 10);
     return courseCount;
 
+  }
+
+  async getCoursesByUniversityID(id: number): Promise<Course[]> {
+    const queryResult = await courseRepository
+      .createQueryBuilder('course')
+      .where('course.universityId = :id', { id })
+      .cache(30000)
+      .getMany();
+
+    return queryResult
   }
 }
 

@@ -20,6 +20,10 @@ class CourseService {
     return await CourseRepository.getAllCourses();
   }
 
+  async getAllCoursesByUniversityID(id: number) {
+    return await CourseRepository.getCoursesByUniversityID(id);
+  }
+
   async findCourseCountByUniversityID(id: number): Promise<number> {
     const count = await CourseRepository.getCourseCountByUniversityID(id);
     return count;

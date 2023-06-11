@@ -3,8 +3,20 @@ import CourseService from "../service/CourseService";
 import { CourseNotFound } from "../types/Errors";
 
 export class CourseController {
-  public static async getCourse(req: Request, res: Response): Promise<void> {
+  public static async getCourse(req: Request, res: Response) {
     try {
+
+      const param = req.query.uni as string;
+      if (param !== undefined) {
+
+        const courses = await CourseService.getAllCoursesByUniversityID(Number(param))
+        return res.status(200).send({
+          message: "All available courses",
+          success: true,
+          data: courses,
+        });
+      }
+
       const courses = await CourseService.getAllCourses();
       res.status(200).send({
         message: "All available courses",
