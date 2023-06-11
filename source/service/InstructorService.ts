@@ -35,6 +35,14 @@ class InstructorService {
   async getNotParseableInstructors() {
     return await InstructorRepository.getNotParseableInstructorCount();
   }
+
+  async getMostCitedUserIndex(id: number) {
+    return await InstructorRepository.getMostCitedUserIndex(id);
+  }
+
+  async getMostPublicationCount(id: number) {
+    return await InstructorRepository.getMostPublicationsCount(id);
+  }
 }
 
 export default new InstructorService();

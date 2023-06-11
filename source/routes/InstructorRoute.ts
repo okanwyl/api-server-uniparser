@@ -10,5 +10,6 @@ export class InstructorRoute {
   routes(): void {
     this.router.get("/instructor/", InstructorController.getInstructor);
     this.router.get("/instructor/:id", InstructorController.getInstructorByID);
+    this.router.get("/instructor/:id/metric", InstructorController.getInstructorMetric);
   }
 }
