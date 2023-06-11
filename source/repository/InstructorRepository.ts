@@ -111,7 +111,11 @@ class InstructorRepository {
 
 
   async getAllInstructors(): Promise<Instructor[]> {
-    return await instructorRepository.find({ cache: true });
+    return await instructorRepository.find({
+      relations: {
+        university: true
+      }, cache: true
+    });
   }
 }
 
