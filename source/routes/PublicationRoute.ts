@@ -10,5 +10,9 @@ export class PublicationRoute {
   }
   routes(): void {
     this.router.get("/publication/", PublicationController.getPublication);
+    this.router.put(
+      "/publication/:id",
+      PublicationController.updatePublication
+    );
   }
 }

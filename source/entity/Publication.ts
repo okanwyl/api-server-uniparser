@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { University } from "./University";
 import { Instructor } from "./Instructor";
+import { PublicationType } from "./PublicationType";
 
 @Entity("publications")
 export class Publication extends BaseEntity {
@@ -26,6 +27,14 @@ export class Publication extends BaseEntity {
 
   @Column({ default: 0 })
   num_citations!: number;
+
+  @Column({
+    type: "enum",
+    enum: PublicationType,
+    default: PublicationType.OTHER,
+    nullable: true,
+  })
+  publication_type!: PublicationType;
 
   @ManyToOne(
     () => Instructor,

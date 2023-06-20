@@ -12,8 +12,8 @@ class APIServer {
 
   constructor() {
     this.app = express();
-    this.routes();
     this.config();
+    this.routes();
   }
 
   public routes(): void {
@@ -28,6 +28,7 @@ class APIServer {
     this.app.use(morgan("dev"));
 
     this.app.use(bodyParser.json({ limit: "10mb" }));
+    this.app.use(express.json({ limit: "10mb" }));
 
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(express.urlencoded({ extended: true }));
